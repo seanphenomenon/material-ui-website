@@ -54,14 +54,12 @@ const useStyles = makeStyles((theme) => ({
       height: '5.5em' 
   },
   },
-
   logoContainer: {
     padding: 0,
     "&:hover": {
       backgroundColor: "transparent", // this hover property gets rid of logo button opacity on hover
     },
   },
-
   tabContainer: {
     marginLeft: "auto",
   },
@@ -70,7 +68,6 @@ const useStyles = makeStyles((theme) => ({
     minWidth: 10,
     marginLeft: "25px",
   },
-
   button: {
     ...theme.typography.estimate,
     borderRadius: "50px",
@@ -78,7 +75,6 @@ const useStyles = makeStyles((theme) => ({
     marginRight: "25px",
     height: "45px",
   },
-
   menu: {
     backgroundColor: theme.palette.common.arcBlue,
     color: "white",
@@ -91,14 +87,12 @@ const useStyles = makeStyles((theme) => ({
       opacity: 1,
     },
   },
-
   drawerIconContainer: {
     "&:hover": {
       backgroundColor: 'transparent'
     },
     marginLeft: 'auto'
   }, 
-
   drawerIcon: {
     height: '50px',
     width: '50px'
@@ -115,17 +109,16 @@ const useStyles = makeStyles((theme) => ({
     ...theme.typography.estimate,
     backgroundColor: theme.palette.common.arcOrange,
   },
-
   drawerItemSelected: {
     opacity: '1'
   }, 
-
   appBar: {
     zIndex: theme.zIndex.modal + 1, // this is created to make app bar appear on top of drawer
   }
 }));
 
 export default function Header(props) {
+
   const classes = useStyles();
   const theme = useTheme();
   const iOS = process.browser && /iPad|iPhone|iPod/.test(navigator.userAgent);
@@ -133,16 +126,16 @@ export default function Header(props) {
 
 
 // Hooks:
-  const [value, setValue] = useState(0); // this controls which nav tab we selected and its route.
+  // const [value, setValue] = useState(0); // this controls which nav tab we selected and its route.
   const [anchorEl, setAnchorEl] = useState(null); // this stores the drop down services tab menu item we clicked on and what we want to be rendered
   const [openMenu, setOpenMenu] = useState(false);
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  // const [selectedIndex, setSelectedIndex] = useState(0);
   const [openDrawer, setOpenDrawer] = useState(0);
 
 
 
   const handleChange = (event, newValue) => {
-    setValue(newValue);
+    props.setValue(newValue);
   };
 
   const handleClick = (event) => {
@@ -153,7 +146,7 @@ export default function Header(props) {
   const handleMenuItemClick = (event, index) => {
     setAnchorEl(null);
     setOpenMenu(false);
-    setSelectedIndex(index);
+    props.setSelectedIndex(index);
   };
 
   const handleClose = (event) => {
@@ -170,89 +163,89 @@ export default function Header(props) {
 
   // The useEffect lifecycle method is used here to make sure that when the page is refreshed, the nav tab stays on the active tab, and does not default to the 'Home' tab.
   useEffect(() => {
-    if (window.location.pathname === "/" && value !== 0) {
-      setValue(0);
-    } else if (window.location.pathname === "/services" && value !== 1) {
-      setValue(1);
-    } else if (window.location.pathname === "/revolution" && value !== 2) {
-      setValue(2);
-    } else if (window.location.pathname === "/about" && value !== 3) {
-      setValue(3);
-    } else if (window.location.pathname === "/contact" && value !== 4) {
-      setValue(4);
-    } else if (window.location.pathname === "/estimate" && value !== 5) {
-      setValue(5);
+    if (window.location.pathname === "/" && props.value !== 0) {
+      props.setValue(0);
+    } else if (window.location.pathname === "/services" && props.value !== 1) {
+      props.setValue(1);
+    } else if (window.location.pathname === "/revolution" && props.value !== 2) {
+      props.setValue(2);
+    } else if (window.location.pathname === "/about" && props.value !== 3) {
+      props.setValue(3);
+    } else if (window.location.pathname === "/contact" && props.value !== 4) {
+      props.setValue(4);
+    } else if (window.location.pathname === "/estimate" && props.value !== 5) {
+      props.setValue(5);
     }
 
     // switch statement is created below to refactor useEffect statements above and fix highlighted menu items when browser is refreshed.
     switch (window.location.pathname) {
       case "/":
-      if (value !== 0) {
-        setValue(0); 
+      if (props.value !== 0) {
+        props.setValue(0); 
       }
       break;
       case "/services":
-      if (value !== 1) {
-        setValue(1);
-        setSelectedIndex(0); // this index number is set in relation to the array created for menu options
+      if (props.value !== 1) {
+        props.setValue(1);
+        props.setSelectedIndex(0); // this index number is set in relation to target the array created for drop down menu options
         }
       break;
 
       case "/customsoftware":
-        if (value !== 1) {
-        setValue(1);
-        setSelectedIndex(1);
+        if (props.value !== 1) {
+        props.setValue(1);
+        props.setSelectedIndex(1);
         }
       break;
 
       case "/mobileapps":
-        if (value !== 1){
-        setValue(1);
-        setSelectedIndex(2);
+        if (props.value !== 1){
+        props.setValue(1);
+        props.setSelectedIndex(2);
        }
       break;
 
       case "/websites":
-        if (value !== 1) {
-          setValue(1);
-          setSelectedIndex(3);
+        if (props.value !== 1) {
+          props.setValue(1);
+          props.setSelectedIndex(3);
         }
       break;
 
       case "/revolution":
-        if (value !== 2) {
-          setValue(2);
+        if (props.value !== 2) {
+          props.setValue(2);
         }
       break;
 
       case "/about":
-        if (value !== 3) {
-          setValue(3);
+        if (props.value !== 3) {
+          props.setValue(3);
         }
       break;
 
       case "/contact":
-        if (value !== 4) {
-          setValue(4);
+        if (props.value !== 4) {
+          props.setValue(4);
         }
       break;
 
       case "/estimate":
-        if (value !== 5) {
-          setValue(5);
+        if (props.value !== 5) {
+          props.setValue(5);
         }
       break;
 
       default:
         break;
     }
-  }, [value]); // we need to pass the value array here at the end of the function, to prevent infinite chain of updates, using the state of value dependencies. If value doesnt change, we do not want to run the useEffect function.
+  }, [props.value, props]); // we need to pass the value array here at the end of the function, to prevent infinite chain of updates, using the state of value dependencies. If value doesnt change, we do not want to run the useEffect function.
 
 
 const tabs = (
   <React.Fragment>
   <Tabs
-  value={value}
+  value={props.value}
   onChange={handleChange}
   className={classes.tabContainer}
   indicatorColor="primary"
@@ -334,10 +327,10 @@ const tabs = (
       classes={{ root: classes.menuItem }}
       onClick={(event) => {
         handleMenuItemClick(event, index);
-        setValue(1);
+        props.setValue(1);
         handleClose();
       }}
-      selected={index === selectedIndex && value === 1} //the selected prop allows us to indicate which menu item is currently selected/active
+      selected={index === props.selectedIndex && props.value === 1} //the selected prop allows us to indicate which menu item is currently selected/active
     >
       {option.name}
     </MenuItem>
@@ -359,28 +352,28 @@ const drawer = (
     >
     <div className={classes.toolbarMargin}/> {/* this is used to help push the drawer menu under the appbar */}
       <List disablePadding>
-        <ListItem   divider button component={Link} to='/' onClick={()=> {setOpenDrawer(false); setValue(0)}} selected={value === 0}>
-          <ListItemText className={value === 0 ? [classes.drawerItem, classes.drawerItemSelected] : classes.drawerItem} disableTypography>Home</ListItemText>
+        <ListItem   divider button component={Link} to='/' onClick={()=> {setOpenDrawer(false); props.setValue(0)}} selected={props.value === 0}>
+          <ListItemText className={props.value === 0 ? [classes.drawerItem, classes.drawerItemSelected] : classes.drawerItem} disableTypography>Home</ListItemText>
         </ListItem>
 
-         <ListItem divider button component={Link} to='/services' onClick={()=> {setOpenDrawer(false); setValue(1)}} selected={value === 1}>
-          <ListItemText className={value === 1 ? [classes.drawerItem, classes.drawerItemSelected] : classes.drawerItem} disableTypography>Services</ListItemText>
+         <ListItem divider button component={Link} to='/services' onClick={()=> {setOpenDrawer(false); props.setValue(1)}} selected={props.value === 1}>
+          <ListItemText className={props.value === 1 ? [classes.drawerItem, classes.drawerItemSelected] : classes.drawerItem} disableTypography>Services</ListItemText>
          </ListItem>
 
-          <ListItem  divider button component={Link} to='/revolution' onClick={()=> {setOpenDrawer(false); setValue(2)}} selected={value === 2}>
-            <ListItemText className={value === 2 ? [classes.drawerItem, classes.drawerItemSelected] : classes.drawerItem} disableTypography>The Revolution</ListItemText>
+          <ListItem  divider button component={Link} to='/revolution' onClick={()=> {setOpenDrawer(false); props.setValue(2)}} selected={props.value === 2}>
+            <ListItemText className={props.value === 2 ? [classes.drawerItem, classes.drawerItemSelected] : classes.drawerItem} disableTypography>The Revolution</ListItemText>
           </ListItem>
 
-          <ListItem  divider button component={Link} to='/about' onClick={()=> {setOpenDrawer(false); setValue(3)}} selected={value === 3}>
-            <ListItemText className={value === 3 ? [classes.drawerItem, classes.drawerItemSelected] : classes.drawerItem} disableTypography>About Us</ListItemText>
+          <ListItem  divider button component={Link} to='/about' onClick={()=> {setOpenDrawer(false); props.setValue(3)}} selected={props.value === 3}>
+            <ListItemText className={props.value === 3 ? [classes.drawerItem, classes.drawerItemSelected] : classes.drawerItem} disableTypography>About Us</ListItemText>
           </ListItem>
 
-          <ListItem   divider button component={Link} to='/contact' onClick={()=> {setOpenDrawer(false); setValue(4)}} selected={value === 4}>
-            <ListItemText className={value === 4 ? [classes.drawerItem, classes.drawerItemSelected] : classes.drawerItem} disableTypography>Contact Us</ListItemText>
+          <ListItem   divider button component={Link} to='/contact' onClick={()=> {setOpenDrawer(false); props.setValue(4)}} selected={props.value === 4}>
+            <ListItemText className={props.value === 4 ? [classes.drawerItem, classes.drawerItemSelected] : classes.drawerItem} disableTypography>Contact Us</ListItemText>
           </ListItem>
 
-          <ListItem className={classes.drawerItemEstimate} divider button component={Link} to='/estimate' onClick={()=> {setOpenDrawer(false); setValue(5)}} selected={value === 5}>
-            <ListItemText className={value === 5 ? [classes.drawerItem, classes.drawerItemSelected] : classes.drawerItem} disableTypography>Free Estimate</ListItemText>
+          <ListItem className={classes.drawerItemEstimate} divider button component={Link} to='/estimate' onClick={()=> {setOpenDrawer(false); props.setValue(5)}} selected={props.value === 5}>
+            <ListItemText className={props.value === 5 ? [classes.drawerItem, classes.drawerItemSelected] : classes.drawerItem} disableTypography>Free Estimate</ListItemText>
           </ListItem>
       </List>
     </SwipeableDrawer>
@@ -404,7 +397,7 @@ const drawer = (
               className={classes.logoContainer}
               component={Link}
               to="/"
-              onClick={() => setValue(0)}
+              onClick={() => props.setValue(0)}
               disableRipple
             >
               {/* we also must wrap/make the logo a button to return to the home page, offset the Button component default padding, and make sure it routes back to home page by adding onclick and updating value state. */}
