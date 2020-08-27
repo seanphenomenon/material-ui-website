@@ -4,6 +4,7 @@ import Footer from '../components/ui/Footer';
 import { ThemeProvider } from "@material-ui/styles";
 import theme from "../components/ui/Theme";
 import {BrowserRouter, Route, Switch } from 'react-router-dom';
+import LandingPage from '../components/LandingPage';
 
 
 function App() {
@@ -16,7 +17,7 @@ function App() {
       <BrowserRouter>
       <Header value={value} setValue={setValue}  selectedIndex={selectedIndex} setSelectedIndex={setSelectedIndex}/>
       <Switch> {/* Switch component only renders the first component which matches the given route to prevent two different routes with the same URL, and accidently render both components at the same time. */}
-  <Route exact path='/' component={()=> <div style={{height: '2000px'}}>Home</div>} />
+  <Route exact path='/' component={LandingPage}/>
   <Route exact path='/services' component={()=> <div>Services</div>} />
   <Route exact path='/customsoftware' component={()=> <div>Custom Software</div>} />
   <Route exact path='/mobileapps' component={()=> <div>Mobile Apps</div>} />
