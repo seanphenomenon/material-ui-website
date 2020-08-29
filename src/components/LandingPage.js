@@ -6,12 +6,16 @@ import Typography from "@material-ui/core/Typography";
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import Button from "@material-ui/core/Button";
 import ButtonArrow from "../components/ui/ButtonArrow";
+import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
+import CardActions from '@material-ui/core/CardActions';
 
 
 import animationData from "../animations/landinganimation/data";
 import CustomSoftwareIcon from "../assets/Custom Software Icon.svg";
 import MobileIcon from '../assets/mobileIcon.svg';
 import WebsiteIcon from '../assets/websiteIcon.svg';
+import revolutionBackground from '../assets/repeatingBackground.svg';
 
 const useStyles = makeStyles((theme) => ({
   // ----- Hero Block ------//
@@ -61,7 +65,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 
-  // --------- Custom Software Block ------------- //
+  // --------- Service Block ------------- //
   serviceContainer: {
       marginTop:'12em',
       [theme.breakpoints.down('sm')]: {
@@ -92,7 +96,30 @@ const useStyles = makeStyles((theme) => ({
           marginLeft: 0,
       },  
   },
-  
+  // ----------- Revolution Block ----------------- //
+  revolutionBackground: {
+    backgroundImage: `url(${revolutionBackground})`,
+    backgroundPosition: 'center',
+    backgroundSize: 'cover',
+    backgroundRepeat: 'no-repeat',
+    height:'100%',
+    width: '100%',
+  },
+  revolutionCard: {
+    position: 'absolute',
+    borderRadius: '15px',
+    padding: '10em', //created bigger card with padding around the text
+    boxShadow: theme.shadows[10],
+    [theme.breakpoints.down('sm')]:{
+        paddingTop: '8em',
+        paddingBottom: '8em',
+        paddingLeft: 0,
+        paddingRight: 0,
+        borderRadius: 0,
+        width: '100%'
+    },
+
+  }
 }));
 
 export default function LandingPage() {
@@ -228,6 +255,42 @@ export default function LandingPage() {
                 <img src={WebsiteIcon} alt='website icon' className={classes.icon} />
               </Grid>
           </Grid>
+            {/* --------------------------- Revolution Block --------------------------------- */}
+                <Grid item >
+                    <Grid container justify='center' alignItems='center' style={{height:'100em', marginTop:'12em'}}> {/* height is needed here in container to allow room for background image to display. background image will cover entire space within container.*/ }
+                    <div className={classes.revolutionBackground}/>
+                    <Card className={classes.revolutionCard}>
+                        <CardContent>
+                            <Grid container direction='column' style={{textAlign: 'center'}}>
+                            <Grid item>
+                            <Typography variant='h3' gutterBottom> 
+                            The Revolution 
+                            </Typography>
+                            </Grid>
+                            <Grid item >
+                                <Typography variant='subtitle1' gutterBottom>
+                                    Visionary insights coupled with cutting-edge technology is a recipe for revolution.
+                                </Typography>
+                            <Button variant="outlined" className={classes.learnButton}>
+                                <span style={{ marginRight: "10px" }}>Learn More</span>
+                            <ButtonArrow
+                             width={15}
+                             height={15}
+                             fill={theme.palette.common.arcBlue}
+                            />
+                            </Button>
+                         </Grid>
+                         </Grid>
+                        </CardContent>
+                    </Card>
+                </Grid>
+            </Grid>
+            
+
+
+
+
+
         </Grid>
       </Grid>
   );
