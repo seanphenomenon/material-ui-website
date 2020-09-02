@@ -40,7 +40,7 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: "50px",
     height: "80px",
     width: "205px",
-    marginRight: "5em",
+    marginRight: "2em",
     marginLeft: '2em',
     fontSize: '1.5rem',
     "&:hover": {
