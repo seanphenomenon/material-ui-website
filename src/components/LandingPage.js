@@ -8,6 +8,13 @@ import Button from "@material-ui/core/Button";
 import ButtonArrow from "../components/ui/ButtonArrow";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
+import {Link} from 'react-router-dom';
+
+
+
+
+import CallToAction from'./ui/CallToAction';
+
 
 import animationData from "../animations/landinganimation/data";
 import CustomSoftwareIcon from "../assets/Custom Software Icon.svg";
@@ -15,6 +22,7 @@ import MobileIcon from "../assets/mobileIcon.svg";
 import WebsiteIcon from "../assets/websiteIcon.svg";
 import revolutionBackground from "../assets/repeatingBackground.svg";
 import infoBackground from "../assets/infoBackground.svg";
+
 
 const useStyles = makeStyles((theme) => ({
   // ----- Hero Block ------//
@@ -126,9 +134,13 @@ const useStyles = makeStyles((theme) => ({
     height: "100%",
     width: "100%",
   },
+
 }));
 
-export default function LandingPage() {
+
+
+
+export default function LandingPage(props) {
   const classes = useStyles();
   const theme = useTheme();
   const matchesSM = useMediaQuery(theme.breakpoints.down("sm")); // this is used to style service container using ternary/conditional rendering only at small breakpoint and not all the time.
@@ -161,12 +173,23 @@ export default function LandingPage() {
               className={classes.buttonContainer}
             >
               <Grid item>
-                <Button variant="contained" className={classes.estimateButton}>
+                <Button 
+                variant="contained" 
+                className={classes.estimateButton}
+                component={Link}
+                to='/estimate'
+                onClick={() => props.setValue(5)}//  value of 5 clears the screen of any active tabs when going to the estimate tab.
+                >
                   Free Estimate
                 </Button>
               </Grid>
               <Grid item>
-                <Button variant="outlined" className={classes.learnButtonHero}>
+                <Button variant="outlined" 
+                className={classes.learnButtonHero}
+                component={Link}
+                to='/revolution'
+                onClick={() => props.setValue(2)}
+                >
                   <span style={{ marginRight: "10px" }}>Learn More</span>
                   <ButtonArrow
                     width={15}
@@ -207,7 +230,13 @@ export default function LandingPage() {
               Complete digital solutions, from investigation to{" "}
               <span className={classes.specialText}>celebration.</span>
             </Typography>
-            <Button variant="outlined" className={classes.learnButton}>
+            <Button 
+            variant="outlined" 
+            className={classes.learnButton}
+            component={Link}
+            to='/customsoftware'
+            onClick={() => {props.setValue(1); props.setSelectedIndex(1)}}
+            >
               <span style={{ marginRight: "10px" }}>Learn More</span>
               <ButtonArrow
                 width={10}
@@ -247,7 +276,13 @@ export default function LandingPage() {
               Integrate your web experience or create a standalone app
               {matchesSM ? null : <br />} with either mobile platform.
             </Typography>
-            <Button variant="outlined" className={classes.learnButton}>
+            <Button 
+            variant="outlined" 
+            className={classes.learnButton}
+            component={Link}
+                to='/mobileapps'
+                onClick={() => {props.setValue(1); props.setSelectedIndex(2)}}
+            >
               <span style={{ marginRight: "10px" }}>Learn More</span>
               <ButtonArrow
                 width={10}
@@ -286,7 +321,13 @@ export default function LandingPage() {
             <Typography variant="subtitle1" className={classes.subtitle}>
               Optimized for Seach Engines, built for speed.
             </Typography>
-            <Button variant="outlined" className={classes.learnButton}>
+            <Button 
+            variant="outlined" 
+            className={classes.learnButton}
+            component={Link}
+            to='/websites'
+            onClick={() => {props.setValue(1); props.setSelectedIndex(3)}}
+            >
               <span style={{ marginRight: "10px" }}>Learn More</span>
               <ButtonArrow
                 width={10}
@@ -331,7 +372,13 @@ export default function LandingPage() {
                       Visionary insights coupled with cutting-edge technology is
                       a recipe for revolution.
                     </Typography>
-                    <Button variant="outlined" className={classes.learnButton}>
+                    <Button 
+                    variant="outlined" 
+                    className={classes.learnButton}
+                    component={Link}
+                    to='/revolution'
+                    onClick={() => {props.setValue(2)}}
+                    >
                       <span style={{ marginRight: "10px" }}>Learn More</span>
                       <ButtonArrow
                         width={15}
@@ -358,10 +405,10 @@ export default function LandingPage() {
             <Grid item container  
             style={{ position: "absolute", textAlign: matchesXS ? 'center':'inherit' }}  //position absolute item container allows both items to be positioned next to each other. 
             direction={matchesXS ? 'column': 'row'}  //column direction of container switches to row at the small breakpoint to stack items. Inherit alignment prop defaults it to go back to what it was doing before. 
-            spacing={matchesXS ? 10 : 0}
             > 
+
               <Grid item sm style={{ marginLeft: matchesXS ? 0 : matchesSM ? '2em' : "5em"}}> {/* nested ternary here checks for xs breakpoint to stack first. if true, set margin left to 0. if not, check sm breakpoint.*/}
-                <Grid container direction='column' >
+                <Grid container style={{marginBottom: matchesXS ? '10em' : 0}} direction='column' > {/* marginBottom here gets rid of horizontal scrolling white space inside component*/}
                   <Typography variant="h2" style={{ color: "white" }}>
                     About Us
                   </Typography>
@@ -373,6 +420,9 @@ export default function LandingPage() {
                     variant="outlined"
                     className={classes.learnButton}
                     style={{ borderColor: "white", color: "white" }}
+                    component={Link}
+                to='/about'
+                onClick={() => props.setValue(3)}
                   >
                     <span style={{marginRight: '10px'}}>Learn More</span>
                     <ButtonArrow  width={15} height={15} fill="white" />
@@ -396,6 +446,9 @@ export default function LandingPage() {
                     variant="outlined"
                     className={classes.learnButton}
                     style={{ borderColor: "white", color: "white" }}
+                    component={Link}
+                to='/contact'
+                onClick={() => props.setValue(4)}
                   >
                     <span style={{marginRight: '10px'}}>Learn More</span>
                     <ButtonArrow width={15} height={15} fill="white" />
@@ -406,9 +459,8 @@ export default function LandingPage() {
             </Grid>
           </Grid>
         </Grid>
-
-        {/* ------------------- Call to Action Block --------------------------- */}
-
+        {/* ------ Call To Action Block ---------------------------- */}
+        <CallToAction setValue={props.setValue}/> {/* passing setvalue function  here to handle active tab*/}
       </Grid>
     </Grid>
   );
