@@ -300,7 +300,7 @@ const tabs = (
   component={Link}
   to="/estimate"
   value={5}
-  OnClick={() => props.setValue(5)} //passing in non-existant value of 5 will clear off any existing active tab./ 
+  onClick={() => props.setValue(5)} //passing in non-existant value of 5 will clear off any existing active tab./ 
 >
   Free Estimate
 </Button>

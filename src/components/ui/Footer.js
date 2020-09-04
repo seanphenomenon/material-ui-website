@@ -27,8 +27,6 @@ const useStyles = makeStyles((theme) => ({
   },
   mainContainer: {
     position: "absolute",
-    top: "5px",
-    // left: "10em",
   },
   link: {
     color: "white",
@@ -249,33 +247,30 @@ export default function Footer(props) {
       >
         <Grid
           item
-          className={classes.icon}
           component={"a"}
           href="http://www.facebook.com"
           rel="noopener noreferrer"
           target="_blank"
         >
-          <img src={facebook} alt="facebook logo" />
+          <img src={facebook} alt="facebook logo" className={classes.icon}/>
         </Grid>
         <Grid
           item
-          className={classes.icon}
           component={"a"}
           href="http://www.twitter.com"
           rel="noopener noreferrer"
           target="_blank"
         >
-          <img src={twitter} alt="twitter logo" />
+          <img src={twitter} alt="twitter logo" className={classes.icon} />
         </Grid>
         <Grid
           item
-          className={classes.icon}
           component={"a"}
           href="http://www.instagram.com"
           rel="noopener noreferrer"
           target="_blank"
         >
-          <img src={instagram} alt="instagram logo" />
+          <img src={instagram} alt="instagram logo" className={classes.icon} />
         </Grid>
       </Grid>
     </footer>

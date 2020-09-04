@@ -10,11 +10,7 @@ import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import {Link} from 'react-router-dom';
 
-
-
-
 import CallToAction from'./ui/CallToAction';
-
 
 import animationData from "../animations/landinganimation/data";
 import CustomSoftwareIcon from "../assets/Custom Software Icon.svg";
@@ -245,7 +241,7 @@ export default function LandingPage(props) {
               />
             </Button>
           </Grid>
-          <Grid Item>
+          <Grid item>
             <img
               src={CustomSoftwareIcon}
               alt="custom software icon"
@@ -291,7 +287,7 @@ export default function LandingPage(props) {
               />
             </Button>
           </Grid>
-          <Grid Item style={{ marginRight: matchesSM ? 0 : "5em" }}>
+          <Grid item style={{ marginRight: matchesSM ? 0 : "5em" }}>
             <img
               src={MobileIcon}
               alt="mobile phone icon"
@@ -336,7 +332,7 @@ export default function LandingPage(props) {
               />
             </Button>
           </Grid>
-          <Grid Item>
+          <Grid item>
             <img
               src={WebsiteIcon}
               alt="website icon"
@@ -393,7 +389,7 @@ export default function LandingPage(props) {
           </Grid>
         </Grid>
         {/* ----------------- Information Block -------------------------------- */}
-        <Grid Item>
+        <Grid item>
           <Grid
             container
             direction="row"
