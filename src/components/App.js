@@ -6,6 +6,7 @@ import theme from "../components/ui/Theme";
 import {BrowserRouter, Route, Switch } from 'react-router-dom';
 import LandingPage from '../components/LandingPage';
 import ServicesPage from '../components/ServicesPage';
+import CustomSoftware from '../components/CustomSoftware';
 
 
 function App() {
@@ -22,7 +23,8 @@ function App() {
   setSelectedIndex={setSelectedIndex}/>}/> {/* adding  value props here allow us to control active nav links and navigation */}
   <Route exact path='/services' render={(props)=> <ServicesPage {...props} setValue={setValue}
   setSelectedIndex={setSelectedIndex}/>} />
-  <Route exact path='/customsoftware' component={()=> <div>Custom Software</div>} />
+  <Route exact path='/customsoftware' render={(props)=> <CustomSoftware {...props} setValue={setValue}
+  setSelectedIndex={setSelectedIndex}/>} />
   <Route exact path='/mobileapps' component={()=> <div>Mobile Apps</div>} />
   <Route exact path='/websites' component={()=> <div>Websites</div>} />
   <Route exact path='/revolution' component={()=> <div>The Revolution</div>} />
