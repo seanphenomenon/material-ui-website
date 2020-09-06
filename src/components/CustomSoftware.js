@@ -66,7 +66,7 @@ export default function CustomSoftware(props) {
   };
   const scaleOptions = {
     loop: true,
-    autoplay: false,
+    autoplay: true,
     animationData: scaleAnimation,
     rendererSettings: {
       preserveAspectRatio: "xMidYMid slice",
@@ -310,7 +310,7 @@ export default function CustomSoftware(props) {
             <Lottie
               options={documentsOptions}
               style={{ maxHeight: 275, maxWidth: 275, minHeight: 250 }}
-              isStopped={true}
+              // isStopped={true}
             />
           </Grid>
         </Grid>
@@ -325,7 +325,7 @@ export default function CustomSoftware(props) {
             <Lottie
               options={scaleOptions}
               style={{ maxHeight: 260, maxWidth: 280 }}
-              isStopped={true}
+              // isStopped={true}
             />
           </Grid>
           <Grid item container direction="column" md>
@@ -448,7 +448,7 @@ export default function CustomSoftware(props) {
             <Lottie
               options={automationOptions}
               style={{ maxHeight: 290, maxWidth: 280 }}
-              isStopped={true}
+              // isStopped={true}
             />
           </Grid>
         </Grid>
@@ -464,7 +464,7 @@ export default function CustomSoftware(props) {
             <Lottie
               options={uxOptions}
               style={{ maxHeight: 310, maxWidth: 155 }}
-              isStopped={true}
+              // isStopped={true}
             />
           </Grid>
           <Grid item container direction="column" md>
