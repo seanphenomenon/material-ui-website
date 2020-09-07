@@ -113,7 +113,7 @@ export default function CustomSoftware(props) {
               to="/services"
               onClick={() => props.setSelectedIndex(0)} //set to 0 for services as active tab in menu
             >
-              <img src={backArrow} alt="back arrow to services page" />
+              <img src={backArrow} alt="back arrow to custom software page" />
             </IconButton>
           </Grid>
         </Hidden>
@@ -181,7 +181,7 @@ export default function CustomSoftware(props) {
             >
               <img
                 src={forwardArrow}
-                alt="forward arrow to ios/adroid app development page"
+                alt="forward arrow to web development page"
               />
             </IconButton>
           </Grid>
