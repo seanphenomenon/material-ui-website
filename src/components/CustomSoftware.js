@@ -111,7 +111,7 @@ export default function CustomSoftware(props) {
               style={{ backgroundColor: "transparent" }}
               component={Link}
               to="/services"
-              onClick={() => props.setSelectedIndex(0)} //set to 0 for services as active tab in menu
+              onClick={() => props.setSelectedIndex(1)} //set to 1 for custom software as active services tab in menu
             >
               <img src={backArrow} alt="back arrow to custom software page" />
             </IconButton>
