@@ -181,7 +181,7 @@ export default function Revolution(props) {
       className={classes.rowContainer}
       >
         <Grid item>
-          <Typography variant='h4' gutterBottom>
+          <Typography variant='h4' gutterBottom style={{marginBottom: '5em'}}>
             Process
           </Typography>
         </Grid>
