@@ -11,6 +11,7 @@ import MobileApps from '../components/MobileApps';
 import Websites from '../components/Websites';
 import Revolution from '../components/Revolution';
 import AboutUs from '../components/AboutUs';
+import ContactUs from '../components/ContactUs';
 
 
 function App() {
@@ -37,7 +38,8 @@ function App() {
   setSelectedIndex={setSelectedIndex}/>} />
   <Route exact path='/about' render={(props)=> <AboutUs {...props} setValue={setValue}
   setSelectedIndex={setSelectedIndex}/>}/>
-  <Route exact path='/contact' component={()=> <div>Contact Us</div>} />
+  <Route exact path='/contact' render={(props)=> <ContactUs {...props} setValue={setValue}
+  setSelectedIndex={setSelectedIndex}/>} />
   <Route exact path='/estimate' component={()=> <div>Estimate</div>} />
       </Switch>
       <Footer 

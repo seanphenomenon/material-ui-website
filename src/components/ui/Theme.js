@@ -86,6 +86,33 @@ export default createMuiTheme({
       fontSize:'1rem',
       fontWeight: 300,
       color: arcGrey
-    }
+    },
   },
+  overrides: { //this theme is for contact us imput fields.
+    MuiInputLabel:{
+      //style is applied to root element
+      root: {
+        color: arcBlue,
+        fontSize:'1rem'
+      }
+    },
+    MuiInput: {
+      root: {
+        //changes color of input text from default black to grey
+        color: arcGrey,
+        fontWeight: 300
+      },
+      underline: {
+        '&:before':{
+          //styling before input is clicked
+          borderBottom:`2px solid ${arcBlue}`
+        },
+        '&:hover:not($disabled):not($focused):not($error):before': {
+          //gets rid of dark color on input hover
+          borderBottom:`2px solid ${arcBlue}`
+
+        }
+      }
+    }
+  }
 });
