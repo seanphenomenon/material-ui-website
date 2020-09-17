@@ -70,10 +70,9 @@ export default function Footer(props) {
           container
           className={classes.mainContainer}
           justify="center"
-          spacing={2}
         >
           <Grid item className={classes.gridItem}>
-            <Grid container direction="column">
+            <Grid container direction="column" spacing={2}>
               <Grid
                 item
                 className={classes.link}
@@ -97,7 +96,7 @@ export default function Footer(props) {
                   props.setSelectedIndex(0);
                 }}
               >
-                <div>Services</div>
+                Services
               </Grid>
               <Grid
                 item
@@ -109,7 +108,7 @@ export default function Footer(props) {
                   props.setSelectedIndex(1);
                 }}
               >
-                <div>Customer Software Development</div>
+                Customer Software Development
               </Grid>
               <Grid
                 item
@@ -121,7 +120,7 @@ export default function Footer(props) {
                   props.setSelectedIndex(2);
                 }}
               >
-                <div>IOS/Android App Development</div>
+                IOS/Android App Development
               </Grid>
               <Grid
                 item
@@ -133,7 +132,7 @@ export default function Footer(props) {
                   props.setSelectedIndex(3);
                 }}
               >
-                <div>Website Development</div>
+                Website Development
               </Grid>
             </Grid>
           </Grid>
@@ -146,7 +145,7 @@ export default function Footer(props) {
                 to="/revolution"
                 onClick={() => props.setValue(2)}
               >
-                <div>The Revolution</div>
+                The Revolution
               </Grid>
               <Grid
                 item
@@ -155,7 +154,7 @@ export default function Footer(props) {
                 to="/revolution"
                 onClick={() => props.setValue(2)}
               >
-                <div>Vision</div>
+                Vision
               </Grid>
               <Grid
                 item
@@ -164,7 +163,7 @@ export default function Footer(props) {
                 to="/revolution"
                 onClick={() => props.setValue(2)}
               >
-                <div>Technology</div>
+                Technology
               </Grid>
               <Grid
                 item
@@ -173,7 +172,7 @@ export default function Footer(props) {
                 to="/revolution"
                 onClick={() => props.setValue(2)}
               >
-                <div>Process</div>
+                Process
               </Grid>
             </Grid>
           </Grid>
@@ -186,7 +185,7 @@ export default function Footer(props) {
                 to="/about"
                 onClick={() => props.setValue(3)}
               >
-                <div>About Us</div>
+                About Us
               </Grid>
               <Grid
                 item
@@ -195,7 +194,7 @@ export default function Footer(props) {
                 to="/about"
                 onClick={() => props.setValue(3)}
               >
-                <div>Mission Statement</div>
+                Mission Statement
               </Grid>
               <Grid
                 item
@@ -204,7 +203,7 @@ export default function Footer(props) {
                 to="/about"
                 onClick={() => props.setValue(3)}
               >
-                <div>History</div>
+                History
               </Grid>
               <Grid
                 item
@@ -213,12 +212,12 @@ export default function Footer(props) {
                 to="/about"
                 onClick={() => props.setValue(3)}
               >
-                <div>Team</div>
+                Team
               </Grid>
             </Grid>
           </Grid>
           <Grid item className={classes.gridItem}>
-            <Grid container direction="column">
+            <Grid container direction="column" spacing={2}>
               <Grid
                 item
                 className={classes.link}
@@ -226,7 +225,7 @@ export default function Footer(props) {
                 to="/contact"
                 onClick={() => props.setValue(4)}
               >
-                <div>Contact Us</div>
+                Contact Us
               </Grid>
             </Grid>
           </Grid>
