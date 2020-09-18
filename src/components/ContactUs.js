@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from 'axios';
 import { Link } from "react-router-dom";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
@@ -127,7 +128,11 @@ export default function ContactUs(props) {
     }
   };
 
-  const disabled = (event) => {};
+  const onConfirm = (event) => {
+    axios.get('https://us-central1-material-ui-course-14395.cloudfunctions.net/sendMail') // this is using firebase cloud function URL
+      .then(response => console.log(response))
+      .catch(error => console.log(error))
+  };
 
   return (
     <Grid container direction="row">
@@ -398,7 +403,7 @@ export default function ContactUs(props) {
                           phoneHelper.length !== 0 ||
                           emailHelper.length !== 0
                       } // to check for validity of contact us form, the button is set to disabled until ALL fields include valid text.
-                  onClick={() => setOpen(true)} // once send message button has been clicked, it will trigger confirmation dialog modal to open on screen.
+                  onClick={onConfirm} // once send message button has been clicked, it will trigger confirmation dialog modal to open on screen.
                 >
                   Send message
                   <img
