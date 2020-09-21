@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from 'axios';
+import axios from "axios";
 import { Link } from "react-router-dom";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
@@ -9,6 +9,8 @@ import TextField from "@material-ui/core/TextField";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import Dialog from "@material-ui/core/Dialog";
 import DialogContent from "@material-ui/core/DialogContent";
+import CircularProgress from "@material-ui/core/CircularProgress";
+import Snackbar from "@material-ui/core/Snackbar";
 
 import ButtonArrow from "../components/ui/ButtonArrow";
 
@@ -90,9 +92,17 @@ export default function ContactUs(props) {
   const [emailHelper, setEmailHelper] = useState(""); // emailHelper is message displayed to user when we have invalid email address. setEmail controls the state
   const [phone, setPhone] = useState("");
   const [phoneHelper, setPhoneHelper] = useState(""); //  phoneHelper is message displayed to user when we have invalid phone number . setPhone controls the state.
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState(""); //  variable for send message button on contact us page
 
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false); //  variable for dialog/modal pop up
+
+  const [loading, setLoading] = useState(false); //  variable for circular progress animation
+
+  const [alert, setAlert] = useState({
+    open: false,
+    message: "",
+    backgroundColor: "",
+  });
 
   const onChange = (event) => {
     let valid;
@@ -128,11 +138,54 @@ export default function ContactUs(props) {
     }
   };
 
-  const onConfirm = (event) => {
-    axios.get('https://us-central1-material-ui-course-14395.cloudfunctions.net/sendMail') // this is using firebase cloud function URL
-      .then(response => console.log(response))
-      .catch(error => console.log(error))
+  const onConfirm = () => {
+      // here we are triggering circular progress on.
+    setLoading(true);
+    axios
+      .get(
+        "https://us-central1-material-ui-course-14395.cloudfunctions.net/sendMail",              // this is using firebase cloud function URL. This is immediately called when network request is executed.
+        {
+          params: {
+            // this is the query string to be able to send off form values to email. Everytime the function is called, we will pass on these values. 
+            name: name,
+            email: email,
+            phone: phone,
+            message: message
+          }
+        }
+      )
+      .then((response) => {
+          //once response is successful, we are closing out of confirmation window and clearing out each input field back to empty string. if not successful, we will catch the error.
+        setLoading(false);
+        setOpen(false);
+        setName("");
+        setEmail("");
+        setPhone("");
+        setMessage("");
+        setAlert({
+
+          open: true,
+          message: 'Message sent successfully!',
+          backgroundColor: "#4BB543",
+        });
+      })
+      .catch((error) => {
+        setLoading(false);
+        setAlert({
+          open: true,
+          message: 'Something went wrong, Please try again!',
+          backgroundColor: "#FF3232",
+        });
+      });
   };
+
+  const buttonContents = (
+    // in order to cut this out of code, and place in a variable, you need to use react fragment. This is created since both button styles are the same, and will be used to include circular progress animation in dialog/conditional rendering below.
+    <React.Fragment>
+      Send message
+      <img src={airplane} alt="paper airplane" style={{ marginLeft: "1em" }} />
+    </React.Fragment>
+  );
 
   return (
     <Grid container direction="row">
@@ -142,11 +195,11 @@ export default function ContactUs(props) {
         item
         container
         direction="column"
-        // justify="center"
+        justify="center"
         alignItems="center"
         style={{
           marginBottom: matchesMD ? "5em" : 0,
-          marginTop: matchesSM ? "1em" : matchesMD ? "5em" : 0
+          marginTop: matchesSM ? "1em" : matchesMD ? "5em" : 0,
         }} //nested ternary style
         lg={4}
         xl={3}
@@ -287,25 +340,22 @@ export default function ContactUs(props) {
                 //     } // to check for validity of contact us form, the button is set to disabled until ALL fields include valid text.
                 onClick={() => setOpen(true)} // once send message button has been clicked, it will trigger confirmation dialog modal to open on screen.
               >
-                Send message
-                <img
-                  src={airplane}
-                  alt="paper airplane"
-                  style={{ marginLeft: "1em" }}
-                />
+                {buttonContents}{" "}
+                {/* using button contents variable above to render button here instead. */}
               </Button>
             </Grid>
           </Grid>
         </Grid>
       </Grid>
       <Dialog
+        style={{ zIndex: 1302 }}
         open={open}
-        fullscreen={matchesXS}
+        fullscreen={matchesSM}
         onClose={() => setOpen(false)}
         PaperProps={{
           style: {
-            paddingTop: matchesXS ? "1em" : '5em',
-            paddingBottom: matchesXS ? "1em" : '5em',
+            paddingTop: matchesXS ? "1em" : "5em",
+            paddingBottom: matchesXS ? "1em" : "5em",
             paddingLeft: matchesXS
               ? 0
               : matchesSM
@@ -322,7 +372,6 @@ export default function ContactUs(props) {
               : "25em",
           },
         }}
-        style={{ zIndex: 1302 }}
       >
         <DialogContent>
           <Grid container direction="column">
@@ -362,60 +411,64 @@ export default function ContactUs(props) {
                 helperText={phoneHelper} // helperText prop provides feedback to user about the error
               />
             </Grid>
+          </Grid>
+          <Grid item style={{ width: matchesSM ? "100%" : "20em" }}>
+            <TextField
+              InputProps={{ disableUnderline: true }} // these are props passed down to the base input component, to get rid of default blue underline on input textfield.
+              value={message}
+              multiline
+              rows={10}
+              id="message"
+              fullWidth
+              onChange={(event) => setMessage(event.target.value)}
+              className={classes.messageBox}
+            />
+          </Grid>
+          <Grid
+            item
+            container
+            style={{ marginTop: "2em" }}
+            alignItems="center"
+            direction={matchesSM ? "column" : "row"}
+          >
+            <Grid item>
+              <Button
+                style={{ fontWeight: 300 }}
+                color="primary"
+                onClick={() => setOpen(false)}
+              >
+                Cancel
+              </Button>
             </Grid>
-            <Grid item style={{ maxWidth: matchesXS ? '100%' : "20em" }}>
-              <TextField
-                InputProps={{ disableUnderline: true }} // these are props passed down to the base input component, to get rid of default blue underline on input textfield.
-                value={message}
-                multiline
-                rows={10}
-                id="message"
-                fullWidth
-                onChange={(event) => setMessage(event.target.value)}
-                className={classes.messageBox}
-              />
+            <Grid item>
+              <Button
+                variant="contained"
+                className={classes.sendButton}
+                disabled={
+                  name.length === 0 ||
+                  email.length === 0 ||
+                  phone.length === 0 ||
+                  message.length === 0 ||
+                  phoneHelper.length !== 0 ||
+                  emailHelper.length !== 0
+                } // to check for validity of contact us form, the button is set to disabled until ALL fields include valid text.
+                onClick={onConfirm} // once send message button has been clicked, it will trigger confirmation dialog modal to open on screen.
+              >
+                {loading ? <CircularProgress size={30} /> : buttonContents}{" "}
+                {/* ternary stating if loading is true, render circular progress animation. if not, render send message button. */}
+              </Button>
             </Grid>
-            <Grid
-              item
-              container
-              style={{ marginTop: "2em" }}
-              alignItems="center"
-              direction={matchesSM ? 'column' : 'row'}
-            >
-              <Grid item>
-                <Button
-                  style={{ fontWeight: 300 }}
-                  color="primary"
-                  onClick={() => setOpen(false)}
-                >
-                  Cancel
-                </Button>
-              </Grid>
-              <Grid item>
-                <Button
-                  variant="contained"
-                  className={classes.sendButton}
-                    disabled={
-                        name.length === 0 ||
-                         email.length === 0 ||
-                         phone.length === 0||
-                         message.length === 0 ||
-                          phoneHelper.length !== 0 ||
-                          emailHelper.length !== 0
-                      } // to check for validity of contact us form, the button is set to disabled until ALL fields include valid text.
-                  onClick={onConfirm} // once send message button has been clicked, it will trigger confirmation dialog modal to open on screen.
-                >
-                  Send message
-                  <img
-                    src={airplane}
-                    alt="paper airplane"
-                    style={{ marginLeft: "1em" }}
-                  />
-                </Button>
-              </Grid>
-            </Grid>
+          </Grid>
         </DialogContent>
       </Dialog>
+      <Snackbar
+        open={alert.open}
+        message={alert.message}
+        ContentProps={{ style: { backgroundColor: alert.backgroundColor } }}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }} // where the snackbar will appear on screen
+        onClose={() => setAlert({ ...alert, open: false })} // passing in current alert state, and override open value to false.
+        autoHideDuration={4000} //after a certain amount of time, snackbar will dissappear (set in milliseconds)
+      />
       <Grid
         item
         container
