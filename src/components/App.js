@@ -12,6 +12,7 @@ import Websites from "../components/Websites";
 import Revolution from "../components/Revolution";
 import AboutUs from "../components/AboutUs";
 import ContactUs from "../components/ContactUs";
+import Estimate from '../components/Estimate';
 
 function App() {
   // value and selectedindex props have been added here from original header file to pass down and use in both the header and footer components
@@ -119,7 +120,14 @@ function App() {
               />
             )}
           />
-          <Route exact path="/estimate" component={() => <div>Estimate</div>} />
+          <Route exact path="/estimate" render={(props) => (
+              <Estimate
+                {...props}
+                setValue={setValue}
+                setSelectedIndex={setSelectedIndex}
+              />
+              )} 
+              />
         </Switch>
         <Footer
           value={value}
