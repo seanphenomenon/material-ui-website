@@ -366,28 +366,39 @@ export default function Estimate() {
     setQuestions(newQuestions);
   };
 
-
   const navigationPreviousDisabled = () => {
     const currentlyActive = questions.filter((question) => question.active);
-   if (currentlyActive[0].id === 1){ // if we're on the first question w/id of 1 (which service are you interested in?) and its active,
-     return true; //  return true because we are disabled
-   } else  {
-    return false;
-   }
+    if (currentlyActive[0].id === 1) {
+      // if we're on the first question w/id of 1 (which service are you interested in?) and its active,
+      return true; //  return true because we are disabled
+    } else {
+      return false;
+    }
   };
 
   const navigationNextDisabled = () => {
     const currentlyActive = questions.filter((question) => question.active); // checks currently active question
-   if (currentlyActive[0].id === questions[questions.length - 1].id){ // so were finding length of questions array, subtracting 1, to give us the last index of the array. and then check the id of that question.
-     return true; //  return true because we are disabled
-   } else {
-    return false;
-   }
+    if (currentlyActive[0].id === questions[questions.length - 1].id) {
+      // so were finding length of questions array, subtracting 1, to give us the last index of the array. and then check the id of that question.
+      return true; //  return true because we are disabled
+    } else {
+      return false;
+    }
   };
 
+  const handleSelect = (id) => {
+    const newQuestions = cloneDeep(questions);
 
+    const currentlyActive = newQuestions.filter((question) => question.active);
+    const activeIndex = currentlyActive[0].id - 1;
 
+    const newSelected = newQuestions[activeIndex].options[id - 1]; //whenever we call the id, the index is one less than.
 
+    newSelected.selected = !newSelected.selected;
+
+    setQuestions(newQuestions);
+
+  };
 
   return (
     <Grid container direction="row">
@@ -399,11 +410,7 @@ export default function Estimate() {
           item
           style={{ marginRight: "10em", maxWidth: "50em", marginTop: "7.5em" }}
         >
-          <Lottie
-            options={estimateOptions}
-            height="100%"
-            Width="100%"
-          />
+          <Lottie options={estimateOptions} height="100%" Width="100%" />
         </Grid>
       </Grid>
       <Grid
@@ -429,6 +436,7 @@ export default function Estimate() {
                     fontWeight: 500,
                     fontSize: "2.25rem",
                     marginTop: "5em",
+                    lineHeight: 1.25,
                   }}
                 >
                   {question.title}
@@ -444,10 +452,28 @@ export default function Estimate() {
                 </Typography>
               </Grid>
               <Grid item container direction="row">
-                {question.options.map((option) => (
+                {question.options.map(option => (
                   //we are dynamically rendering each grid item here and targeting each option.
-                  <Grid item container direction="column" md>
-                    <Grid item style={{ maxWidth: "12em" }}>
+                  <Grid
+                    item
+                    container
+                    direction="column"
+                    md
+                    component={Button} // component prop turns each grid item in question to clickable button.
+                    
+                    // these style props, changes grid item button components back to normal style, while maintaining clickable button component functionality.
+                    onClick={() => handleSelect(option.id)} // selects the appropriate id of item, and backgroundColor ternary in style above, will change color when item is selected.
+                    style={{
+                      display: "grid",
+                      textTransform: "none",
+                      borderRadius: 10,
+                      margin: 5,
+                      backgroundColor: option.selected
+                      ? theme.palette.common.arcOrange
+                      : null  
+                    }}
+                 >
+                    <Grid item style={{ maxWidth: "14em" }}>
                       <Typography
                         variant="h6"
                         align="center"
@@ -480,13 +506,30 @@ export default function Estimate() {
           style={{ width: "18em", marginTop: "3em" }}
         >
           <Grid item>
-            <IconButton  onClick={previousQuestion} disabled={navigationPreviousDisabled()}>
-              <img src={navigationPreviousDisabled() ? backArrowDisabled : backArrow} alt="Previous question" /> {/* nav function disabled ternary is called upon render. If true, it displays back arrow disabled(gray). if false, display normal arrow. */}
+            <IconButton
+              onClick={previousQuestion}
+              disabled={navigationPreviousDisabled()}
+            >
+              <img
+                src={navigationPreviousDisabled() ? backArrowDisabled : backArrow}
+                alt="Previous question"
+              />{" "}
+              {/* nav function disabled ternary is called upon render. If true, it displays back arrow disabled(gray). if false, display normal arrow. */}
             </IconButton>
           </Grid>
           <Grid item>
-            <IconButton   onClick={nextQuestion} disabled={navigationNextDisabled()}> {/* once it reaches the last question, arrow disables. */}
-              <img src={navigationNextDisabled() ? forwardArrowDisabled : forwardArrow} alt="Next question" />
+            <IconButton
+              onClick={nextQuestion}
+              disabled={navigationNextDisabled()}
+            >
+              {" "}
+              {/* once it reaches the last question, arrow disables. */}
+              <img
+                src={
+                  navigationNextDisabled() ? forwardArrowDisabled : forwardArrow
+                }
+                alt="Next question"
+              />
             </IconButton>
           </Grid>
         </Grid>
