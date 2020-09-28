@@ -7,9 +7,12 @@ import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
 import IconButton from "@material-ui/core/IconButton";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
+import Dialog from "@material-ui/core/Dialog";
+import DialogContent from "@material-ui/core/DialogContent";
+import TextField from "@material-ui/core/TextField";
 
 import check from "../assets/check.svg";
-import send from "../assets/seo.svg";
+import send from "../assets/send.svg";
 import software from "../assets/software.svg";
 import mobile from "../assets/mobile.svg";
 import website from "../assets/website.svg";
@@ -59,6 +62,17 @@ const useStyles = makeStyles((theme) => ({
     "&:hover": {
       backgroundColor: theme.palette.secondary.light,
     },
+  },
+  messageBox: {
+    border: `2px solid ${theme.palette.common.arcBlue}`,
+    marginTop: "5em",
+    borderRadius: 5,
+  },
+  specialText: {
+    fontFamily: "Raleway",
+    fontWeight: 700,
+    fontSize: "1.5rem",
+    color: theme.palette.common.arcOrange,
   },
 }));
 
@@ -327,7 +341,24 @@ const websiteQuestions = [
 export default function Estimate() {
   const classes = useStyles();
   const theme = useTheme();
-  const [questions, setQuestions] = useState(softwareQuestions);
+  const [questions, setQuestions] = useState(defaultQuestions); //default question 'What services are you interested in?"  is in state, and displays first.
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [emailHelper, setEmailHelper] = useState(""); // from ContactUs page
+  const [phone, setPhone] = useState("");
+  const [phoneHelper, setPhoneHelper] = useState(""); //  from ContactUs page
+  const [message, setMessage] = useState("");
+
+  const [total, setTotal] = useState(0);
+
+  const [service, setService] = useState([]);
+  const [platforms, setPlatforms] = useState([]);
+  const [features, setFeatures] = useState([]);
+  const [customFeatures, setCustomFeatures] = useState("");
+  const [category, setCategory] = useState("");
+  const [users, setUsers] = useState("");
 
   const matchesMD = useMediaQuery(theme.breakpoints.down("md"));
   const matchesSM = useMediaQuery(theme.breakpoints.down("sm"));
@@ -393,12 +424,151 @@ export default function Estimate() {
     const activeIndex = currentlyActive[0].id - 1;
 
     const newSelected = newQuestions[activeIndex].options[id - 1]; //whenever we call the id, the index is one less than.
+    const previousSelected = currentlyActive[0].options.filter(
+      (option) => option.selected
+    );
 
-    newSelected.selected = !newSelected.selected;
+    //switch case statement below targets only the select one subtitles, to only allow one selected item question option.
+    switch (currentlyActive[0].subtitle) {
+      case "Select one.":
+        if (previousSelected[0]) {
+          // if there's any option selected before this question, turn off the selection for previous selection, and turn on for new selection. That way we only have one option selected every time.
+          previousSelected[0].selected = !previousSelected[0].selected;
+        }
+        newSelected.selected = !newSelected.selected;
+        break;
+      default:
+        newSelected.selected = !newSelected.selected;
+        break;
+    }
 
-    setQuestions(newQuestions);
-
+    // switching over the titles of option we just clicked on, to tell which option we selected. Case titles must be exact.
+    switch (newSelected.title) {
+      case "Custom Software Development": // if we're clicking this section, it will move on to softwareQuestions etc.
+        setQuestions(softwareQuestions);
+        setService(newSelected.title); // this stores selected service in state for selection review.
+        break;
+      case "iOS/Android App Development":
+        setQuestions(softwareQuestions);
+        setService(newSelected.title);
+        break;
+      case "Website Development":
+        setQuestions(websiteQuestions);
+        setService(newSelected.title);
+        break;
+      default:
+        setQuestions(newQuestions); // if we're clicking on anything else, we are just on a regular question. So we set questions, to newQuestions that we have used to toggle the selection.
+    }
   };
+
+  //Onchange function below is from ContactUs page
+  const onChange = (event) => {
+    let valid;
+
+    switch (event.target.id) {
+      case "email":
+        setEmail(event.target.value);
+        valid = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(
+          event.target.value
+        );
+
+        if (!valid) {
+          setEmailHelper("Invalid email");
+        } else {
+          setEmailHelper("");
+        }
+        break;
+      case "phone":
+        setPhone(event.target.value);
+        valid = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/.test(
+          event.target.value
+        );
+
+        if (!valid) {
+          setPhoneHelper("Invalid phone number");
+        } else {
+          setPhoneHelper("");
+        }
+        break;
+      default:
+        break;
+    }
+  };
+
+  const getTotal = () => {
+    let cost = 0;
+
+    // from questions state, map over questions so we get access, then take the question options, then  filter  options of each question, and see if the selected option is selected or true. Then, filter that question length is greater than 0, so we dont have an empty array in console, for selecting the first question item. Console will just display chosen items with cost amount .
+    const selections = questions
+      .map((question) => question.options.filter((option) => option.selected))
+      .filter((question) => question.length > 0);
+
+    selections.map((options) => options.map((option) => (cost += option.cost))); // for selected items, map over and add cost value to cost variable above to get total.
+
+    if (questions.length > 2) {
+      const userCost = questions
+        .filter(
+          (question) => question.title === "How many users do you expect?"
+        )
+        .map((question) =>
+          question.options.filter((option) => option.selected)
+        )[0][0];
+        
+        setUsers(userCost.title)
+
+      cost -= userCost.cost;
+      cost *= userCost.cost;
+      console.log(cost);
+    }
+
+    setTotal(cost); //setting total state to cost.
+
+    console.log(selections); // this will console log all selected items(arrays)
+  };
+
+  const getPlatforms = () => {
+    let newPlatforms = [];
+
+    if (questions.length > 2) {
+      // in the case that we have more than 2 questions, return array at first index containing the actual question, map over array to give us that individual question thats selected set to true.
+      questions
+        .filter(
+          (question) =>
+            question.title === "Which platforms do you need supported?"
+        )
+        .map((question) =>
+          question.options.filter((option) => option.selected)
+        )[0]
+        .map((option) => newPlatforms.push(option.title));
+      console.log(newPlatforms);
+
+      setPlatforms(newPlatforms);
+    }
+  };
+  const getFeatures = () => {
+    let newFeatures = []; //creates an array for all selected features
+
+    if (questions.length > 2) {
+      // in the case that we have more than 2 questions, return array at first index containing the actual question, map over array to give us that individual question thats selected set to true.
+      questions
+        .filter(
+          (question) =>
+            question.title === "Which features do you expect to use?"
+        )
+        .map((question) => question.options.filter((option) => option.selected))
+        .map((option) => option.map(newFeature => newFeatures.push(newFeature.title)));
+
+      console.log(newFeatures);
+      setFeatures(newFeatures);
+    }
+  };
+
+  const getCustomFeatures = () => {
+    if (questions.length > 2){
+      const newCustomFeatures = questions.filter(question => question.title === 'What type of custom features do you expect to need?').map(question => question.options.filter(option => option.selected))[0][0].title
+      setCustomFeatures(newCustomFeatures);
+    }
+  }
 
   return (
     <Grid container direction="row">
@@ -452,7 +622,7 @@ export default function Estimate() {
                 </Typography>
               </Grid>
               <Grid item container direction="row">
-                {question.options.map(option => (
+                {question.options.map((option) => (
                   //we are dynamically rendering each grid item here and targeting each option.
                   <Grid
                     item
@@ -460,7 +630,6 @@ export default function Estimate() {
                     direction="column"
                     md
                     component={Button} // component prop turns each grid item in question to clickable button.
-                    
                     // these style props, changes grid item button components back to normal style, while maintaining clickable button component functionality.
                     onClick={() => handleSelect(option.id)} // selects the appropriate id of item, and backgroundColor ternary in style above, will change color when item is selected.
                     style={{
@@ -469,10 +638,10 @@ export default function Estimate() {
                       borderRadius: 10,
                       margin: 5,
                       backgroundColor: option.selected
-                      ? theme.palette.common.arcOrange
-                      : null  
+                        ? theme.palette.common.arcOrange
+                        : null,
                     }}
-                 >
+                  >
                     <Grid item style={{ maxWidth: "14em" }}>
                       <Typography
                         variant="h6"
@@ -511,7 +680,9 @@ export default function Estimate() {
               disabled={navigationPreviousDisabled()}
             >
               <img
-                src={navigationPreviousDisabled() ? backArrowDisabled : backArrow}
+                src={
+                  navigationPreviousDisabled() ? backArrowDisabled : backArrow
+                }
                 alt="Previous question"
               />{" "}
               {/* nav function disabled ternary is called upon render. If true, it displays back arrow disabled(gray). if false, display normal arrow. */}
@@ -534,11 +705,201 @@ export default function Estimate() {
           </Grid>
         </Grid>
         <Grid item>
-          <Button variant="contained" className={classes.estimateButton}>
+          <Button
+            variant="contained"
+            className={classes.estimateButton}
+            onClick={() => {
+              setDialogOpen(true);
+              getTotal();
+              getPlatforms();
+              getFeatures();
+              getCustomFeatures();
+            }}
+          >
             Get Estimate
           </Button>
         </Grid>
       </Grid>
+      <Dialog
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        style={{ zIndex: 1302 }}
+      >
+        <Grid container justify="center">
+          <Grid item>
+            <Typography variant="h2" align="center">
+              Estimate
+            </Typography>
+          </Grid>
+        </Grid>
+        <DialogContent>
+          <Grid container>
+            <Grid item container direction="column" md={7}>
+              <Grid item style={{ marginBottom: "0.5em" }}>
+                <TextField
+                  id="name"
+                  label="Name"
+                  fullWidth
+                  value={name}
+                  onChange={(event) => setName(event.target.value)}
+                />
+              </Grid>
+              <Grid item style={{ marginBottom: "0.5em" }}>
+                <TextField
+                  id="email"
+                  label="Email"
+                  fullWidth
+                  value={email}
+                  onChange={onChange} // using the onchange function above
+                  error={emailHelper.length !== 0} //returns true if emailHelper string (in onChange function above) does not equal 0 (in other words, if we have anything in state BUT 0, it's not valid, we must have helper text in display, which means we have invalid email.)
+                  helperText={emailHelper} // helperText prop provides feedback to user about the error
+                />
+              </Grid>
+              <Grid item style={{ marginBottom: "0.5em" }}>
+                <TextField
+                  id="phone"
+                  label="Phone"
+                  fullWidth
+                  value={phone}
+                  onChange={onChange} // using the onchage function above
+                  error={phoneHelper.length !== 0} // if we have a useState length greater than 0, then it must mean we have helper text in state, and we must have an invalid phone number.
+                  helperText={phoneHelper} // helperText prop provides feedback to user about the error
+                />
+              </Grid>
+              <Grid item style={{ width: "20em" }}>
+                <TextField
+                  InputProps={{ disableUnderline: true }} // these are props passed down to the base input component, to get rid of default blue underline on input textfield.
+                  value={message}
+                  multiline
+                  rows={10}
+                  id="message"
+                  fullWidth
+                  onChange={(event) => setMessage(event.target.value)}
+                  className={classes.messageBox}
+                />
+              </Grid>
+              <Grid item>
+                <Typography variant="body1" paragraph>
+                  We can create this digital solution for an estimated{" "}
+                  <span className={classes.specialText}>
+                    ${total.toFixed(2)}
+                  </span>{" "}
+                  {/* to fixed created total with two decimal places */}
+                </Typography>
+                <Typography variant="body1" paragraph>
+                  Fill out your name, phone number, and email, place your
+                  request, and we'll get back with you with details moving
+                  forward and a final price.
+                </Typography>
+              </Grid>
+            </Grid>
+            {/* --------- Checklist Selection Review ---------- */}
+            <Grid item container direction="column" md={5}>
+              <Grid item>
+                <Grid container direction="column">
+                  <Grid item container alignItems="center">
+                    <Grid item>
+                      <img src={check} alt="checkmark" />
+                    </Grid>
+                    <Grid item>
+                      <Typography variant="body1">
+                        You want {service}
+                        {platforms.length > 0
+                          ? ` for ${
+                              //if only web application is selected...
+                              platforms.indexOf("Web Application") > -1 &&
+                              platforms.length === 1
+                                ? //then finish sentence here
+                                  "a Web Application."
+                                : //otherwise, if web application and another platform is selected...
+                                platforms.indexOf("Web Application") > -1 &&
+                                  platforms.length === 2
+                                ? //then finish the sentence here
+                                  `a Web Application and an ${platforms[1]}.`
+                                : //otherwise, if only one platform is selected which isn't web application...
+                                platforms.length === 1
+                                ? //then finish the sentence here
+                                  `an ${platforms[0]}`
+                                : //otherwise, if other two options are selected...
+                                platforms.length === 2
+                                ? //then finish the sentence here
+                                  "an iOS Application and an Android Application."
+                                : //otherwise if all three are selected...
+                                platforms.length === 3
+                                ? //then finish the sentence here
+                                  "a Web Application, an iOS Application, and an Android Application."
+                                : null
+                            }`
+                          : null}
+                      </Typography>
+                    </Grid>
+                  </Grid>
+                  <Grid item container alignItems="center">
+                    <Grid item>
+                      <img src={check} alt="checkmark" />
+                    </Grid>
+                    <Grid item>
+                      <Typography variant="body1">
+                      {"with "}
+                        {/* if we have features... */}
+                        {features.length > 0
+                          ? //...and there's only 1...
+                            features.length === 1
+                              ? //then end the sentence here
+                              `${features[0]}.`
+                              : //otherwise, if there are two features...
+                            features.length === 2
+                              ? //...then end the sentence here
+                              `${features[0]} and ${features[1]}.`
+                              : //otherwise, if there are three or more features...
+                              features
+                            //filter out the very last feature...
+                            .filter(
+                              (feature, index) =>
+                              index !== features.length - 1
+                            )
+                            //and for those features return their name...
+                            .map((feature, index) => (
+                              <span key={index}>{`${feature}, `}</span>
+                            ))
+                          : null}
+                        {features.length > 0 &&
+                          features.length !== 1 &&
+                          features.length !== 2
+                            ? //...and then finally add the last feature with 'and' in front of it
+                            ` and ${features[features.length - 1]}.`
+                            : null}
+
+                      </Typography>
+                    </Grid>
+                  </Grid>
+                  <Grid item container alignItems="center">
+                    <Grid item>
+                      <img src={check} alt="checkmark" />
+                    </Grid>
+                    <Grid item>
+                      <Typography variant="body1">
+                        The custom features will be of {customFeatures.toLowerCase()}
+                        {`, and the project will be used by about ${users} users.`}
+                      </Typography>
+                    </Grid>
+                  </Grid>
+                </Grid>
+              </Grid>
+              <Grid item>
+                <Button variant="contained" className={classes.estimateButton}>
+                  Place Request
+                  <img
+                    src={send}
+                    alt="paper airplane"
+                    style={{ marginLeft: "0.5em" }}
+                  />
+                </Button>
+              </Grid>
+            </Grid>
+          </Grid>
+        </DialogContent>
+      </Dialog>
     </Grid>
   );
 }
