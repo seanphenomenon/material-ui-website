@@ -359,14 +359,14 @@ export default function ContactUs(props) {
             paddingLeft: matchesXS
               ? 0
               : matchesSM
-              ? 0
+              ? '5em'
               : matchesMD
               ? "15em"
               : "25em",
             paddingRight: matchesXS
               ? 0
               : matchesSM
-              ? 0
+              ? '5em'
               : matchesMD
               ? "15em"
               : "25em",
