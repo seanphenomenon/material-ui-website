@@ -139,23 +139,23 @@ export default function ContactUs(props) {
   };
 
   const onConfirm = () => {
-      // here we are triggering circular progress on.
+    // here we are triggering circular progress on.
     setLoading(true);
     axios
       .get(
-        "https://us-central1-material-ui-course-14395.cloudfunctions.net/sendMail",              // this is using firebase cloud function URL. This is immediately called when network request is executed.
+        "https://us-central1-material-ui-course-14395.cloudfunctions.net/sendMail", // this is using firebase cloud function URL. This is immediately called when network request is executed.
         {
           params: {
-            // this is the query string to be able to send off form values to email. Everytime the function is called, we will pass on these values. 
+            // this is the query string to be able to send off form values to email. Everytime the function is called, we will pass on these values.
             name: name,
             email: email,
             phone: phone,
-            message: message
-          }
+            message: message,
+          },
         }
       )
       .then((response) => {
-          //once response is successful, we are closing out of confirmation window and clearing out each input field back to empty string. if not successful, we will catch the error.
+        //once response is successful, we are closing out of confirmation window and clearing out each input field back to empty string. if not successful, we will catch the error.
         setLoading(false);
         setOpen(false);
         setName("");
@@ -163,9 +163,8 @@ export default function ContactUs(props) {
         setPhone("");
         setMessage("");
         setAlert({
-
           open: true,
-          message: 'Message sent successfully!',
+          message: "Message sent successfully!",
           backgroundColor: "#4BB543",
         });
       })
@@ -173,7 +172,7 @@ export default function ContactUs(props) {
         setLoading(false);
         setAlert({
           open: true,
-          message: 'Something went wrong, Please try again!',
+          message: "Something went wrong, Please try again!",
           backgroundColor: "#FF3232",
         });
       });
@@ -324,8 +323,7 @@ export default function ContactUs(props) {
                 fullWidth
                 onChange={(event) => setMessage(event.target.value)}
                 className={classes.messageBox}
-                placeholder= 'Tell us more about your project'
-
+                placeholder="Tell us more about your project"
               />
             </Grid>
             <Grid item container justify="center" style={{ marginTop: "2em" }}>
@@ -361,14 +359,14 @@ export default function ContactUs(props) {
             paddingLeft: matchesXS
               ? 0
               : matchesSM
-              ? '5em'
+              ? "5em"
               : matchesMD
               ? "15em"
               : "25em",
             paddingRight: matchesXS
               ? 0
               : matchesSM
-              ? '5em'
+              ? "5em"
               : matchesMD
               ? "15em"
               : "25em",

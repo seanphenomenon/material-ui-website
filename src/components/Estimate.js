@@ -687,7 +687,7 @@ export default function Estimate() {
     ) {
       disabled = false;
     }
-  
+
     return disabled;
   };
 
@@ -1051,7 +1051,7 @@ export default function Estimate() {
                   fullWidth
                   onChange={(event) => setMessage(event.target.value)}
                   className={classes.messageBox}
-                  placeholder= 'Tell us more about your project'
+                  placeholder="Tell us more about your project"
                 />
               </Grid>
               <Grid item>
@@ -1059,7 +1059,7 @@ export default function Estimate() {
                   variant="body1"
                   paragraph
                   align={matchesSM ? "center" : undefined}
-                  style={{lineHeight: 1.25}}
+                  style={{ lineHeight: 1.25 }}
                 >
                   We can create this digital solution for an estimated{" "}
                   <span className={classes.specialText}>
