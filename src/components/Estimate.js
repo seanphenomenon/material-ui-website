@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 import { cloneDeep } from "lodash";
 import Lottie from "react-lottie";
 import { makeStyles, useTheme } from "@material-ui/styles";
@@ -10,7 +11,9 @@ import useMediaQuery from "@material-ui/core/useMediaQuery";
 import Dialog from "@material-ui/core/Dialog";
 import DialogContent from "@material-ui/core/DialogContent";
 import TextField from "@material-ui/core/TextField";
-import Hidden from '@material-ui/core/Hidden';
+import Hidden from "@material-ui/core/Hidden";
+import Snackbar from "@material-ui/core/Snackbar";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 import check from "../assets/check.svg";
 import send from "../assets/send.svg";
@@ -67,7 +70,7 @@ const useStyles = makeStyles((theme) => ({
   messageBox: {
     border: `2px solid ${theme.palette.common.arcBlue}`,
     marginTop: "3em",
-    marginBottom: '2em',
+    marginBottom: "2em",
     borderRadius: 5,
   },
   specialText: {
@@ -347,7 +350,6 @@ export default function Estimate() {
   const matchesSM = useMediaQuery(theme.breakpoints.down("sm"));
   const matchesXS = useMediaQuery(theme.breakpoints.down("xs"));
 
-
   const [questions, setQuestions] = useState(defaultQuestions); //default question 'What services are you interested in?"  is in state, and displays first.
   const [dialogOpen, setDialogOpen] = useState(false);
 
@@ -367,7 +369,13 @@ export default function Estimate() {
   const [category, setCategory] = useState("");
   const [users, setUsers] = useState("");
 
- 
+  const [loading, setLoading] = useState(false); //  variable for circular progress animation
+
+  const [alert, setAlert] = useState({
+    open: false,
+    message: "",
+    backgroundColor: "",
+  });
 
   const estimateOptions = {
     loop: true,
@@ -452,29 +460,29 @@ export default function Estimate() {
       case "Custom Software Development": // if we're clicking this section, it will move on to softwareQuestions etc.
         setQuestions(softwareQuestions);
         setService(newSelected.title); // this stores selected service in state for selection review.
-        setPlatforms([]) //makes sure to clear out previous selections.state in these sections
-        setFeatures([]) //makes sure to clear out previous selections/state in these sections
-        setCustomFeatures('') //makes sure to clear out previous selections.state in these sections
-        setCategory('') //makes sure to clear out previous selections/state in these sections
-        setUsers('')//makes sure to clear out previous selections/state in these sections
+        setPlatforms([]); //makes sure to clear out previous selections.state in these sections
+        setFeatures([]); //makes sure to clear out previous selections/state in these sections
+        setCustomFeatures(""); //makes sure to clear out previous selections.state in these sections
+        setCategory(""); //makes sure to clear out previous selections/state in these sections
+        setUsers(""); //makes sure to clear out previous selections/state in these sections
         break;
       case "iOS/Android App Development":
         setQuestions(softwareQuestions);
         setService(newSelected.title);
-        setPlatforms([]) //makes sure to clear out previous selections.state in these sections at review, when going back to edit previous selections
-        setFeatures([]) //makes sure to clear out previous selections/state in these sections at review, when going back to edit previous selections
-        setCustomFeatures('') //makes sure to clear out previous selections.state in these sections at review, when going back to edit previous selections
-        setCategory('') //makes sure to clear out previous selections/state in these sections at review, when going back to edit previous selections
-        setUsers('')//makes sure to clear out previous selections/state in these sections at review, when going back to edit previous selections
+        setPlatforms([]); //makes sure to clear out previous selections.state in these sections at review, when going back to edit previous selections
+        setFeatures([]); //makes sure to clear out previous selections/state in these sections at review, when going back to edit previous selections
+        setCustomFeatures(""); //makes sure to clear out previous selections.state in these sections at review, when going back to edit previous selections
+        setCategory(""); //makes sure to clear out previous selections/state in these sections at review, when going back to edit previous selections
+        setUsers(""); //makes sure to clear out previous selections/state in these sections at review, when going back to edit previous selections
         break;
       case "Website Development":
         setQuestions(websiteQuestions);
         setService(newSelected.title);
-        setPlatforms([]) //makes sure to clear out previous selections.state in these sections at review, when going back to edit previous selections
-        setFeatures([]) //makes sure to clear out previous selections/state in these sections at review, when going back to edit previous selections
-        setCustomFeatures('') //makes sure to clear out previous selections.state in these sections at review, when going back to edit previous selections
-        setCategory('') //makes sure to clear out previous selections/state in these sections at review, when going back to edit previous selections
-        setUsers('')//makes sure to clear out previous selections/state in these sections at review, when going back to edit previous selections
+        setPlatforms([]); //makes sure to clear out previous selections.state in these sections at review, when going back to edit previous selections
+        setFeatures([]); //makes sure to clear out previous selections/state in these sections at review, when going back to edit previous selections
+        setCustomFeatures(""); //makes sure to clear out previous selections.state in these sections at review, when going back to edit previous selections
+        setCategory(""); //makes sure to clear out previous selections/state in these sections at review, when going back to edit previous selections
+        setUsers(""); //makes sure to clear out previous selections/state in these sections at review, when going back to edit previous selections
         break;
       default:
         setQuestions(newQuestions); // if we're clicking on anything else, we are just on a regular question. So we set questions, to newQuestions that we have used to toggle the selection.
@@ -533,8 +541,8 @@ export default function Estimate() {
         .map((question) =>
           question.options.filter((option) => option.selected)
         )[0][0];
-        
-        setUsers(userCost.title)
+
+      setUsers(userCost.title);
 
       cost -= userCost.cost;
       cost *= userCost.cost;
@@ -576,7 +584,9 @@ export default function Estimate() {
             question.title === "Which features do you expect to use?"
         )
         .map((question) => question.options.filter((option) => option.selected))
-        .map((option) => option.map(newFeature => newFeatures.push(newFeature.title)));
+        .map((option) =>
+          option.map((newFeature) => newFeatures.push(newFeature.title))
+        );
 
       console.log(newFeatures);
       setFeatures(newFeatures);
@@ -584,137 +594,242 @@ export default function Estimate() {
   };
 
   const getCustomFeatures = () => {
-    if (questions.length > 2){
-      const newCustomFeatures = questions.filter(question => question.title === 'What type of custom features do you expect to need?').map(question => question.options.filter(option => option.selected))[0][0].title
+    if (questions.length > 2) {
+      const newCustomFeatures = questions
+        .filter(
+          (question) =>
+            question.title ===
+            "What type of custom features do you expect to need?"
+        )
+        .map((question) =>
+          question.options.filter((option) => option.selected)
+        )[0][0].title;
       setCustomFeatures(newCustomFeatures);
     }
   };
 
   const getCategory = () => {
-    if (questions.length === 2){
-      const newCategory = questions.filter(question => question.title === 'Which type of website are you wanting?')[0].options.filter(option => option.selected)[0].title
+    if (questions.length === 2) {
+      const newCategory = questions
+        .filter(
+          (question) =>
+            question.title === "Which type of website are you wanting?"
+        )[0]
+        .options.filter((option) => option.selected)[0].title;
 
-     setCategory(newCategory);
+      setCategory(newCategory);
     }
-  }
+  };
+
+  const sendEstimate = () => {
+    //copied from contact us
+    setLoading(true);
+
+    axios
+      .get(
+        "https://us-central1-material-ui-course-14395.cloudfunctions.net/sendMail", // this is using firebase cloud function URL. This is immediately called when network request is executed.
+        {
+          params: {
+            // this is the query string to be able to send off form values to email. Everytime the function is called, we will pass on these values.
+            name: name,
+            email: email,
+            phone: phone,
+            message: message,
+            total: total,
+            category: category,
+            service: service,
+            platforms: platforms,
+            features: features,
+            customFeatures: customFeatures,
+            users: users,
+          },
+        }
+      )
+      .then((response) => {
+        setLoading(false);
+        setAlert({
+          open: true,
+          message: "Message sent successfully!",
+          backgroundColor: "#4BB543",
+        });
+        setDialogOpen(false);
+      })
+      .catch((error) => {
+        console.error(error);
+        setLoading(false);
+        setAlert({
+          open: true,
+          message: "Something went wrong, Please try again!",
+          backgroundColor: "#FF3232",
+        });
+      });
+  };
+
+  //disable estimate button conditionals/function below:
+  const estimateDisabled = () => {
+    let disabled = true;
+    // goes into each question to see if any are selected, and retue if true. if nothing selected, array will be empty/zero. if zero, we are left with all questions not answered yet.
+    const emptySelections = questions
+      .map((question) => question.options.filter((option) => option.selected))
+      .filter((question) => question.length === 0);
+
+    if (questions.length === 2) {
+      if (emptySelections.length === 1) {
+        disabled = false;
+      }
+    } else if (questions.length === 1) {
+      disabled = true;
+    } else if (
+      emptySelections.length < 3 &&
+      questions[questions.length - 1].options.filter(
+        (option) => option.selected
+      ).length > 0
+    ) {
+      disabled = false;
+    }
+  
+    return disabled;
+  };
 
   const softwareSelection = (
     <Grid container direction="column">
-    <Grid item container alignItems="center" style={{marginBottom:'1.25em'}}>
-      <Grid item xs={2}>
-        <img src={check} alt="checkmark" />
-      </Grid>
-      <Grid item xs={10}>
-        <Typography variant="body1">
-          You want {service}
-          {platforms.length > 0
-            ? ` for ${
-                //if only web application is selected...
-                platforms.indexOf("Web Application") > -1 &&
-                platforms.length === 1
-                  ? //then finish sentence here
-                    "a Web Application."
-                  : //otherwise, if web application and another platform is selected...
+      <Grid
+        item
+        container
+        alignItems="center"
+        style={{ marginBottom: "1.25em" }}
+      >
+        <Grid item xs={2}>
+          <img src={check} alt="checkmark" />
+        </Grid>
+        <Grid item xs={10}>
+          <Typography variant="body1">
+            You want {service}
+            {platforms.length > 0
+              ? ` for ${
+                  //if only web application is selected...
                   platforms.indexOf("Web Application") > -1 &&
-                    platforms.length === 2
-                  ? //then finish the sentence here
-                    `a Web Application and an ${platforms[1]}.`
-                  : //otherwise, if only one platform is selected which isn't web application...
                   platforms.length === 1
-                  ? //then finish the sentence here
-                    `an ${platforms[0]}`
-                  : //otherwise, if other two options are selected...
-                  platforms.length === 2
-                  ? //then finish the sentence here
-                    "an iOS Application and an Android Application."
-                  : //otherwise if all three are selected...
-                  platforms.length === 3
-                  ? //then finish the sentence here
-                    "a Web Application, an iOS Application, and an Android Application."
-                  : null
-              }`
-            : null}
-        </Typography>
+                    ? //then finish sentence here
+                      "a Web Application."
+                    : //otherwise, if web application and another platform is selected...
+                    platforms.indexOf("Web Application") > -1 &&
+                      platforms.length === 2
+                    ? //then finish the sentence here
+                      `a Web Application and an ${platforms[1]}.`
+                    : //otherwise, if only one platform is selected which isn't web application...
+                    platforms.length === 1
+                    ? //then finish the sentence here
+                      `an ${platforms[0]}`
+                    : //otherwise, if other two options are selected...
+                    platforms.length === 2
+                    ? //then finish the sentence here
+                      "an iOS Application and an Android Application."
+                    : //otherwise if all three are selected...
+                    platforms.length === 3
+                    ? //then finish the sentence here
+                      "a Web Application, an iOS Application, and an Android Application."
+                    : null
+                }`
+              : null}
+          </Typography>
+        </Grid>
       </Grid>
-    </Grid>
-    <Grid item container alignItems="center" style={{marginBottom:'1.25em'}}>
-      <Grid item xs={2}>
-        <img src={check} alt="checkmark" />
-      </Grid>
-      <Grid item xs={10}>
-        <Typography variant="body1">
-        {"with "}
-          {/* if we have features... */}
-          {features.length > 0
-            ? //...and there's only 1...
-              features.length === 1
+      <Grid
+        item
+        container
+        alignItems="center"
+        style={{ marginBottom: "1.25em" }}
+      >
+        <Grid item xs={2}>
+          <img src={check} alt="checkmark" />
+        </Grid>
+        <Grid item xs={10}>
+          <Typography variant="body1">
+            {"with "}
+            {/* if we have features... */}
+            {features.length > 0
+              ? //...and there's only 1...
+                features.length === 1
                 ? //then end the sentence here
-                `${features[0]}.`
+                  `${features[0]}.`
                 : //otherwise, if there are two features...
-              features.length === 2
+                features.length === 2
                 ? //...then end the sentence here
-                `${features[0]} and ${features[1]}.`
+                  `${features[0]} and ${features[1]}.`
                 : //otherwise, if there are three or more features...
-                features
-              //filter out the very last feature...
-              .filter(
-                (feature, index) =>
-                index !== features.length - 1
-              )
-              //and for those features return their name...
-              .map((feature, index) => (
-                <span key={index}>{`${feature}, `}</span>
-              ))
-            : null}
-          {features.length > 0 &&
+                  features
+                    //filter out the very last feature...
+                    .filter((feature, index) => index !== features.length - 1)
+                    //and for those features return their name...
+                    .map((feature, index) => (
+                      <span key={index}>{`${feature}, `}</span>
+                    ))
+              : null}
+            {features.length > 0 &&
             features.length !== 1 &&
             features.length !== 2
               ? //...and then finally add the last feature with 'and' in front of it
-              ` and ${features[features.length - 1]}.`
+                ` and ${features[features.length - 1]}.`
               : null}
-
-        </Typography>
+          </Typography>
+        </Grid>
+      </Grid>
+      <Grid item container alignItems="center">
+        <Grid item xs={2}>
+          <img src={check} alt="checkmark" />
+        </Grid>
+        <Grid item xs={10}>
+          <Typography variant="body1">
+            The custom features will be of {customFeatures.toLowerCase()}
+            {`, and the project will be used by about ${users} users.`}
+          </Typography>
+        </Grid>
       </Grid>
     </Grid>
-    <Grid item container alignItems="center" >
-      <Grid item xs={2}>
-        <img src={check} alt="checkmark" />
-      </Grid>
-      <Grid item xs={10}>
-        <Typography variant="body1">
-          The custom features will be of {customFeatures.toLowerCase()}
-          {`, and the project will be used by about ${users} users.`}
-        </Typography>
-      </Grid>
-    </Grid>
-  </Grid>
-  )
+  );
   const websiteSelection = (
-    <Grid container direction="column" style={{marginTop: '14em'}}>
-    <Grid item container alignItems="center">
-      <Grid item xs={2}>
-        <img src={check} alt="checkmark" />
-      </Grid>
-      <Grid item xs={10}>
-        <Typography variant='body1'>
-          You want {category === 'Basic' ? 'a Basic Website' : `an ${category} Website.`}
-        </Typography>
+    <Grid container direction="column" style={{ marginTop: "14em" }}>
+      <Grid item container alignItems="center">
+        <Grid item xs={2}>
+          <img src={check} alt="checkmark" />
+        </Grid>
+        <Grid item xs={10}>
+          <Typography variant="body1">
+            You want{" "}
+            {category === "Basic"
+              ? "a Basic Website"
+              : `an ${category} Website.`}
+          </Typography>
+        </Grid>
       </Grid>
     </Grid>
-    
-  </Grid>
-  )
-
+  );
 
   return (
     <Grid container direction="row">
-      <Grid item container direction="column" lg alignItems={matchesMD ? 'center' : undefined}>
-        <Grid item style={{ marginTop: "2em", marginLeft: matchesMD ? 0 : "5em" }}>
-          <Typography variant="h2" align={matchesMD ? 'center' : undefined}>Estimate</Typography>
+      <Grid
+        item
+        container
+        direction="column"
+        lg
+        alignItems={matchesMD ? "center" : undefined}
+      >
+        <Grid
+          item
+          style={{ marginTop: "2em", marginLeft: matchesMD ? 0 : "5em" }}
+        >
+          <Typography variant="h2" align={matchesMD ? "center" : undefined}>
+            Estimate
+          </Typography>
         </Grid>
         <Grid
           item
-          style={{ marginRight: matchesMD ? 0 : "10em", maxWidth: "50em", marginTop: "7.5em" }}
+          style={{
+            marginRight: matchesMD ? 0 : "10em",
+            maxWidth: "50em",
+            marginTop: "7.5em",
+          }}
         >
           <Lottie options={estimateOptions} height="100%" Width="100%" />
         </Grid>
@@ -743,9 +858,8 @@ export default function Estimate() {
                     fontSize: "2.25rem",
                     marginTop: "5em",
                     lineHeight: 1.25,
-                    marginLeft: matchesSM ? '1em':0,
-                    marginRight: matchesSM ? '1em':0,
-
+                    marginLeft: matchesSM ? "1em" : 0,
+                    marginRight: matchesSM ? "1em" : 0,
                   }}
                 >
                   {question.title}
@@ -761,13 +875,14 @@ export default function Estimate() {
                 </Typography>
               </Grid>
               <Grid item container direction="row">
-                {question.options.map((option) => (
+                {question.options.map((option, index) => (
                   //we are dynamically rendering each grid item here and targeting each option.
                   <Grid
                     item
                     container
                     direction="column"
                     md
+                    key={index}
                     component={Button} // component prop turns each grid item in question to clickable button.
                     // these style props, changes grid item button components back to normal style, while maintaining clickable button component functionality.
                     onClick={() => handleSelect(option.id)} // selects the appropriate id of item, and backgroundColor ternary in style above, will change color when item is selected.
@@ -776,7 +891,7 @@ export default function Estimate() {
                       textTransform: "none",
                       borderRadius: 10,
                       margin: 5,
-                      marginBottom: matchesSM ? '1.5em' : 0,
+                      marginBottom: matchesSM ? "1.5em" : 0,
                       backgroundColor: option.selected
                         ? theme.palette.common.arcOrange
                         : null,
@@ -856,6 +971,7 @@ export default function Estimate() {
               getCustomFeatures();
               getCategory();
             }}
+            disabled={estimateDisabled()} //calling it right away if its being returned as true or false. displays total unanswered question arrays in console for each question. first question, always shows/leaves an empty array.
           >
             Get Estimate
           </Button>
@@ -865,20 +981,35 @@ export default function Estimate() {
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
         fullWidth //this full width prop is needed in order to use maxWidth prop below. This helps to give space in-between estimate inputs and checklist
-        maxWidth='lg'
-        fullScreen ={matchesSM}
+        maxWidth="lg"
+        fullScreen={matchesSM}
         style={{ zIndex: 1302 }}
       >
         <Grid container justify="center">
           <Grid item>
-            <Typography variant="h2" align="center" style={{marginTop: '1em', marginBottom: '1em'}}>
+            <Typography
+              variant="h2"
+              align="center"
+              style={{ marginTop: "1em", marginBottom: "1em" }}
+            >
               Estimate
             </Typography>
           </Grid>
         </Grid>
         <DialogContent>
-          <Grid container  direction={matchesSM ? 'column': 'row'} justify='space-around' alignItems={matchesSM ? 'center': undefined}>
-            <Grid item container direction="column" md={7} style={{maxWidth: '20em'}}>
+          <Grid
+            container
+            direction={matchesSM ? "column" : "row"}
+            justify="space-around"
+            alignItems={matchesSM ? "center" : undefined}
+          >
+            <Grid
+              item
+              container
+              direction="column"
+              md={7}
+              style={{ maxWidth: "20em" }}
+            >
               <Grid item style={{ marginBottom: "0.5em" }}>
                 <TextField
                   id="name"
@@ -920,17 +1051,27 @@ export default function Estimate() {
                   fullWidth
                   onChange={(event) => setMessage(event.target.value)}
                   className={classes.messageBox}
+                  placeholder= 'Tell us more about your project'
                 />
               </Grid>
               <Grid item>
-                <Typography variant="body1" paragraph align={matchesSM ? 'center': undefined}>
+                <Typography
+                  variant="body1"
+                  paragraph
+                  align={matchesSM ? "center" : undefined}
+                  style={{lineHeight: 1.25}}
+                >
                   We can create this digital solution for an estimated{" "}
                   <span className={classes.specialText}>
                     ${total.toFixed(2)}
                   </span>{" "}
                   {/* to fixed created total with two decimal places */}
                 </Typography>
-                <Typography variant="body1" paragraph align={matchesSM ? 'center': undefined}>
+                <Typography
+                  variant="body1"
+                  paragraph
+                  align={matchesSM ? "center" : undefined}
+                >
                   Fill out your name, phone number, and email, place your
                   request, and we'll get back with you with details moving
                   forward and a final price.
@@ -938,34 +1079,73 @@ export default function Estimate() {
               </Grid>
             </Grid>
             {/* --------- Checklist Selection Review ---------- */}
-            <Grid item container direction="column" md={5} style={{maxWidth: '30em'}} alignItems={matchesSM ? 'center': undefined}>
+            <Grid
+              item
+              container
+              direction="column"
+              md={5}
+              style={{ maxWidth: "30em" }}
+              alignItems={matchesSM ? "center" : undefined}
+            >
               <Hidden smDown>
-              <Grid item>
-                {questions.length > 2 ? softwareSelection : websiteSelection}
-              </Grid>
+                <Grid item>
+                  {questions.length > 2 ? softwareSelection : websiteSelection}
+                </Grid>
               </Hidden>
-              
+
               <Grid item>
-                <Button variant="contained" className={classes.estimateButton}>
-                  Place Request
-                  <img
-                    src={send}
-                    alt="paper airplane"
-                    style={{ marginLeft: "0.5em" }}
-                  />
+                <Button
+                  variant="contained"
+                  className={classes.estimateButton}
+                  onClick={sendEstimate}
+                  disabled={
+                    name.length === 0 ||
+                    email.length === 0 ||
+                    phone.length === 0 ||
+                    message.length === 0 ||
+                    phoneHelper.length !== 0 ||
+                    emailHelper.length !== 0
+                  } // to check
+                >
+                  {loading ? (
+                    <CircularProgress />
+                  ) : (
+                    <React.Fragment>
+                      {" "}
+                      {/* snackbar popup from contact us added here. if loading, display circular progress, if not, render original button */}
+                      Place Request
+                      <img
+                        src={send}
+                        alt="paper airplane"
+                        style={{ marginLeft: "0.5em" }}
+                      />
+                    </React.Fragment>
+                  )}
                 </Button>
               </Grid>
               <Hidden mdUp>
-              <Grid item style={{marginBottom: matchesSM ? '5em' : 0}}>
-                <Button style={{fontWeight: 300}} color='primary' onClick={() => setDialogOpen(false)}>
-                  Cancel
-                </Button>
-              </Grid>
+                <Grid item style={{ marginBottom: matchesSM ? "5em" : 0 }}>
+                  <Button
+                    style={{ fontWeight: 300 }}
+                    color="primary"
+                    onClick={() => setDialogOpen(false)}
+                  >
+                    Cancel
+                  </Button>
+                </Grid>
               </Hidden>
             </Grid>
           </Grid>
         </DialogContent>
       </Dialog>
+      <Snackbar
+        open={alert.open}
+        message={alert.message}
+        ContentProps={{ style: { backgroundColor: alert.backgroundColor } }}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }} // where the snackbar will appear on screen
+        onClose={() => setAlert({ ...alert, open: false })} // passing in current alert state, and override open value to false.
+        autoHideDuration={4000} //after a certain amount of time, snackbar will dissappear (set in milliseconds)
+      />
     </Grid>
   );
 }

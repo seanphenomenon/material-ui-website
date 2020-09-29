@@ -324,6 +324,8 @@ export default function ContactUs(props) {
                 fullWidth
                 onChange={(event) => setMessage(event.target.value)}
                 className={classes.messageBox}
+                placeholder= 'Tell us more about your project'
+
               />
             </Grid>
             <Grid item container justify="center" style={{ marginTop: "2em" }}>
